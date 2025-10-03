@@ -12,12 +12,12 @@ export default function Report() {
   const [reports, setReports] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [page, setPage] = useState(1);
-  const [limit] = useState(5); 
+  const [limit, setLimit] = useState(5); // items per page
   const [search, setSearch] = useState("");
   const [sortAsc, setSortAsc] = useState(true);
   const navigate = useNavigate();
 
-  const fetchReports = async (page) => {
+  const fetchReports = async (page, limit) => {
     try {
       const res = await fetch(
         `http://localhost:5000/api/report/all?page=${page}&limit=${limit}`
@@ -31,18 +31,20 @@ export default function Report() {
   };
 
   useEffect(() => {
-    fetchReports(page);
-  }, [page]);
+    fetchReports(page, limit);
+  }, [page, limit]);
 
+  // Client-side search filter
   const filteredReports = reports.filter((report) =>
     report.reportJson.reportId.toLowerCase().includes(search.toLowerCase())
   );
 
-  const sortedReports = [...filteredReports].sort((a, b) => {
-    return sortAsc
+  // Client-side sort by createdAt
+  const sortedReports = [...filteredReports].sort((a, b) =>
+    sortAsc
       ? new Date(a.createdAt) - new Date(b.createdAt)
-      : new Date(b.createdAt) - new Date(a.createdAt);
-  });
+      : new Date(b.createdAt) - new Date(a.createdAt)
+  );
 
   if (!reports.length)
     return (
@@ -53,12 +55,10 @@ export default function Report() {
 
   return (
     <div className="p-8">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
         <h1 className="text-3xl font-bold text-gray-800">📊 All Reports</h1>
 
-        <div className="flex items-center gap-3">
-          {/* Search */}
+        <div className="flex items-center gap-3 flex-wrap">
           <div className="flex items-center border rounded-xl px-3 py-2 bg-white shadow-sm">
             <Search size={18} className="text-gray-400" />
             <input
@@ -70,17 +70,30 @@ export default function Report() {
             />
           </div>
 
-          {/* Filter / Sort */}
           <button
             onClick={() => setSortAsc(!sortAsc)}
             className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-xl text-sm font-medium hover:bg-gray-200 transition"
           >
             <ArrowUpDown size={16} /> Sort by Date
           </button>
+
+          <select
+            value={limit}
+            onChange={(e) => {
+              setLimit(Number(e.target.value));
+              setPage(1);
+            }}
+            className="px-3 py-2 border rounded-xl text-sm bg-white hover:border-gray-400 transition"
+          >
+            {[5, 10, 20].map((l) => (
+              <option key={l} value={l}>
+                {l} per page
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 
-      {/* Table */}
       <div className="overflow-hidden border border-gray-200 rounded-2xl shadow-lg bg-white">
         <table className="min-w-full">
           <thead className="bg-gray-100">
@@ -150,7 +163,6 @@ export default function Report() {
         </table>
       </div>
 
-      {/* Pagination */}
       <div className="flex justify-end items-center mt-4 gap-2">
         <button
           disabled={page === 1}
