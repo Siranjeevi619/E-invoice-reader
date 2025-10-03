@@ -3,7 +3,7 @@ import Upload from "./pages/Upload";
 import Result from "./pages/Result";
 import Report from "./pages/Report";
 import Navbar from "./components/layout/Navbar";
-import Sidebar from "./components/layout/Sidebar";
+import Sidebar from "./components/layout/SideBar";
 import { useEffect } from "react";
 
 function App() {
