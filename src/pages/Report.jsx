@@ -12,7 +12,7 @@ export default function Report() {
   const [reports, setReports] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(5); // items per page
+  const [limit, setLimit] = useState(5); 
   const [search, setSearch] = useState("");
   const [sortAsc, setSortAsc] = useState(true);
   const navigate = useNavigate();
