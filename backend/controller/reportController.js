@@ -3,8 +3,23 @@ const Report = require("../model/report.js");
 
 const getAllReport = async (req, res) => {
   try {
-    const reports = await Report.find();
-    res.json(reports);
+    let { page = 1, limit = 10 } = req.query;
+    page = parseInt(page);
+    limit = parseInt(limit);
+
+    const total = await Report.countDocuments();
+
+    const reports = await Report.find()
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    res.json({
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+      reports,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to fetch reports" });
