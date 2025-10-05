@@ -8,7 +8,7 @@ const uploadSchema = new mongoose.Schema({
   erp: String,
   rowsParsed: Number,
   rawContent: String,
-  createdAt: { type: Date, default: Date.now },
+  createdAt: { type: Date, default: Date.now, expires: 7 * 24 * 60 * 60 },
 });
 
 module.exports = mongoose.model("Upload", uploadSchema);

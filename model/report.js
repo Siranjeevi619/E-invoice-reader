@@ -6,7 +6,7 @@ const reportSchema = new mongoose.Schema({
   uploadId: { type: mongoose.Schema.Types.ObjectId, ref: "Upload" },
   reportJson: Object,
   scoresOverall: Number,
-  createdAt: { type: Date, default: Date.now },
+  createdAt: { type: Date, default: Date.now, expires: 7 * 24 * 60 * 60 },
 });
 
 module.exports = mongoose.model("Report", reportSchema);
