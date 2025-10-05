@@ -6,10 +6,12 @@ export default function Result() {
   const { id } = useParams();
   const [report, setReport] = useState(null);
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
   useEffect(() => {
     fetch(`${API_URL}/api/report/${id}`)
       .then((res) => res.json())
-      .then((data) => setReport(data.reportJson))
+      .then((data) => setReport(data))
+      .then(console.log(report))
       .catch((err) => console.error(err));
   }, [id]);
 
@@ -35,6 +37,7 @@ export default function Result() {
         </div>
       </div>
 
+      {/* Scores */}
       <div className="bg-white shadow rounded-xl p-4 sm:p-6 space-y-4">
         <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
           Scores
@@ -61,13 +64,22 @@ export default function Result() {
         ))}
       </div>
 
+      {/* Coverage */}
       <div className="bg-white shadow rounded-xl p-4 sm:p-6">
         <h2 className="text-lg sm:text-xl font-semibold mb-4">Coverage</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
           {[
             { title: "Matched", color: "green", list: report.coverage.matched },
-            { title: "Close", color: "yellow", list: report.coverage.close },
-            { title: "Missing", color: "red", list: report.coverage.missing },
+            {
+              title: "Close",
+              color: "yellow",
+              list: report.coverage.close || [],
+            },
+            {
+              title: "Missing",
+              color: "red",
+              list: report.coverage.missing || [],
+            },
           ].map((section, idx) => (
             <div
               key={idx}
@@ -88,6 +100,7 @@ export default function Result() {
         </div>
       </div>
 
+      {/* Rule Findings */}
       <div className="bg-white shadow rounded-xl p-4 sm:p-6">
         <h2 className="text-lg sm:text-xl font-semibold mb-4">Rule Findings</h2>
         <ul className="space-y-2 sm:space-y-3">
@@ -102,9 +115,9 @@ export default function Result() {
                 <XCircle className="text-red-500" size={18} />
               )}
               <div className="flex-1">
-                <span className="font-medium">{finding.rule}</span>{" "}
+                <span className="font-medium">{finding.rule}</span>
                 {finding.value && (
-                  <span className="text-gray-500">({finding.value})</span>
+                  <span className="text-gray-500"> ({finding.value})</span>
                 )}
                 {finding.exampleLine && (
                   <span className="block text-gray-500 text-xs sm:text-sm mt-1">
@@ -117,18 +130,23 @@ export default function Result() {
         </ul>
       </div>
 
+      {/* Detected Gaps */}
       <div className="bg-white shadow rounded-xl p-4 sm:p-6">
         <h2 className="text-lg sm:text-xl font-semibold mb-4">Detected Gaps</h2>
-        <div className="flex flex-wrap gap-2">
-          {report.gaps.map((gap, idx) => (
-            <span
-              key={idx}
-              className="px-3 py-1 text-sm sm:text-base bg-red-100 text-red-700 rounded-full"
-            >
-              {gap}
-            </span>
-          ))}
-        </div>
+        {report.gaps.length === 0 ? (
+          <p className="text-gray-400">None</p>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {report.gaps.map((gap, idx) => (
+              <span
+                key={idx}
+                className="px-3 py-1 text-sm sm:text-base bg-red-100 text-red-700 rounded-full"
+              >
+                {gap}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="bg-white shadow rounded-xl p-4 sm:p-6 space-y-2">
