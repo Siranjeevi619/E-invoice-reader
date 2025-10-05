@@ -16,7 +16,7 @@ const postUpload = async (req, res) => {
     let rawContent = "";
     if (req.file) {
       rawContent = fs.readFileSync(req.file.path, "utf8");
-      fs.unlinkSync(req.file.path);
+      fs.unlinkSync(req.file.path); // removal of file uploads
     } else if (req.body.text) {
       rawContent = req.body.text;
     } else return res.status(400).json({ error: "No file or text provided" });
