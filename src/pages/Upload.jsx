@@ -99,7 +99,7 @@ export default function Upload() {
           <label className="block w-full">
             <input
               type="file"
-              accept=".json"
+              accept=".json,.csv"
               onChange={(e) => setFile(e.target.files[0])}
               className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
                          file:rounded-full file:border-0 file:bg-blue-50 file:text-blue-700
