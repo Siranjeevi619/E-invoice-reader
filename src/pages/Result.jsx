@@ -10,16 +10,39 @@ export default function Result() {
   useEffect(() => {
     fetch(`${API_URL}/api/report/${id}`)
       .then((res) => res.json())
-      .then((data) => setReport(data))
-      .then(console.log(report))
+      .then((data) => {
+        setReport(data);
+        console.log(data);
+      })
       .catch((err) => console.error(err));
   }, [id]);
 
   if (!report)
     return <p className="p-6 text-center text-gray-500 text-lg">Loading...</p>;
 
+  const handleDownload = () => {
+    const blob = new Blob([JSON.stringify(report, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${report.reportId || "report"}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 bg-gray-50 min-h-screen">
+      <div className="flex justify-end mb-4">
+        <button
+          onClick={handleDownload}
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+        >
+          Download JSON
+        </button>
+      </div>
+
       <div className="bg-white shadow rounded-xl p-4 sm:p-6">
         <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-gray-800">
           Report: {report.reportId}
@@ -37,7 +60,6 @@ export default function Result() {
         </div>
       </div>
 
-      {/* Scores */}
       <div className="bg-white shadow rounded-xl p-4 sm:p-6 space-y-4">
         <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
           Scores
@@ -64,7 +86,6 @@ export default function Result() {
         ))}
       </div>
 
-      {/* Coverage */}
       <div className="bg-white shadow rounded-xl p-4 sm:p-6">
         <h2 className="text-lg sm:text-xl font-semibold mb-4">Coverage</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
@@ -100,7 +121,6 @@ export default function Result() {
         </div>
       </div>
 
-      {/* Rule Findings */}
       <div className="bg-white shadow rounded-xl p-4 sm:p-6">
         <h2 className="text-lg sm:text-xl font-semibold mb-4">Rule Findings</h2>
         <ul className="space-y-2 sm:space-y-3">
@@ -130,7 +150,6 @@ export default function Result() {
         </ul>
       </div>
 
-      {/* Detected Gaps */}
       <div className="bg-white shadow rounded-xl p-4 sm:p-6">
         <h2 className="text-lg sm:text-xl font-semibold mb-4">Detected Gaps</h2>
         {report.gaps.length === 0 ? (
