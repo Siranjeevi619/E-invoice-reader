@@ -8,11 +8,13 @@ export default function Report() {
   const [limit, setLimit] = useState(5);
   const [search, setSearch] = useState("");
   const [sortAsc, setSortAsc] = useState(true);
+  const [loading, setLoading] = useState(false); 
   const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   const fetchReports = async (page, limit) => {
     try {
+      setLoading(true);
       const res = await fetch(
         `${API_URL}/api/report/all?page=${page}&limit=${limit}`
       );
@@ -21,6 +23,8 @@ export default function Report() {
       setTotalPages(data.totalPages);
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false); 
     }
   };
 
@@ -37,6 +41,15 @@ export default function Report() {
       ? new Date(a.createdAt) - new Date(b.createdAt)
       : new Date(b.createdAt) - new Date(a.createdAt)
   );
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[70vh] space-y-3">
+        <div className="w-10 h-10 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
+        <p className="text-gray-600">Loading reports...</p>
+      </div>
+    );
+  }
 
   if (!reports.length)
     return (
