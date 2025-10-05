@@ -1,6 +1,9 @@
 const Upload = require("../model/upload");
 const Report = require("../model/report");
-const { analyzeData, normalizeData } = require("../services/analyzerService");
+const {
+  analyzeDataDynamic,
+  normalizeDataDynamic,
+} = require("../services/analyzerService");
 const fs = require("fs");
 const multer = require("multer");
 const csv = require("csv-parser");
@@ -26,7 +29,8 @@ const postUpload = async (req, res) => {
     });
 
     res.json({ uploadId: uploadDoc._id });
-  } catch {
+  } catch (err) {
+    console.error("Upload failed:", err);
     res.status(500).json({ error: "Upload failed" });
   }
 };
@@ -36,9 +40,7 @@ const parseCSV = async (raw) =>
     const rows = [];
     Readable.from(raw)
       .pipe(csv())
-      .on("data", (row) => {
-        if (rows.length < 200) rows.push(row);
-      })
+      .on("data", (row) => rows.push(row))
       .on("end", () => resolve(rows))
       .on("error", reject);
   });
@@ -52,13 +54,13 @@ const postAnalyze = async (req, res) => {
     let data;
     try {
       const raw = JSON.parse(uploadDoc.rawContent);
-      data = Array.isArray(raw) ? normalizeData(raw) : [];
+      data = Array.isArray(raw) ? normalizeDataDynamic(raw) : [];
     } catch {
       data = await parseCSV(uploadDoc.rawContent);
-      data = normalizeData(data);
+      data = normalizeDataDynamic(data);
     }
 
-    const reportJson = analyzeData(data, uploadDoc);
+    const reportJson = analyzeDataDynamic(data, uploadDoc);
     await Report.create({
       uploadId,
       reportJson,
@@ -66,7 +68,8 @@ const postAnalyze = async (req, res) => {
     });
 
     res.json(reportJson);
-  } catch {
+  } catch (err) {
+    console.error("Analyze failed:", err);
     res.status(500).json({ error: "Analyze failed" });
   }
 };

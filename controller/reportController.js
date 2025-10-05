@@ -21,7 +21,7 @@ const getAllReport = async (req, res) => {
 const getReport = async (req, res) => {
   const reportId = req.params.reportId;
   try {
-    const report = await Report.findOne({ reportId });
+    const report = await Report.findOne({ uploadId: reportId });
     if (!report) return res.status(404).json({ error: "Report not found" });
     res.json(report.reportJson);
   } catch {
